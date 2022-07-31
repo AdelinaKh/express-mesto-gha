@@ -9,15 +9,14 @@ const getCards = (req, res) => {
 const deleteCardsById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      if(card) {
-        return res.status(200).send({ data: card })
-      } else {
-        return res.status(400).send('Ошибка пользователь не найден')
+      if(!card) {
+        return res.status(404).send('Карточка с указанным id не найдена')
       }
+      return res.status(200).send({ data: card })
     })
     .catch((err) => {
       if(err.name === 'CastError') {
-        return res.status(404).send({ message: 'Карточка не найдена' })
+        return res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки' })
       }
       return res.status(500).send({ message: 'Произошла ошибка' })
     });
