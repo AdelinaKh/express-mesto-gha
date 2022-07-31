@@ -8,13 +8,13 @@ const getUsers = (req, res) => {
 //возвращает пользователя по _id
 const getUsersById = (req, res) => {
   User.findById(req.params.userId)
-    .then((user) => {
-      if(user) {
-        res.status(200).send({ data: user })
-      } else {
-        res.send('Ошибка пользователь не найден')
-      }
-    })
+  .then((user) => {
+    if (!user) {
+      res.status(404).send({ message: '404 — Пользователь по указанному _id не найден.' });
+      return;
+    }
+    res.status(200).send(user);
+  })
     .catch((err) => {
       if(err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Переданы некорректные данные' })
