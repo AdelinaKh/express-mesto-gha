@@ -10,13 +10,13 @@ const deleteCardsById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if(card) {
-        res.status(200).send({ data: card })
+        return res.status(200).send({ data: card })
       } else {
-        res.send('Ошибка пользователь не найден')
+        return res.status(400).send('Ошибка пользователь не найден')
       }
     })
     .catch((err) => {
-      if(err.name === 'DateError') {
+      if(err.name === 'CastError') {
         return res.status(404).send({ message: 'Карточка не найдена' })
       }
       return res.status(500).send({ message: 'Произошла ошибка' })
