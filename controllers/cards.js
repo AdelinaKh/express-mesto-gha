@@ -9,19 +9,18 @@ const getCards = (req, res) => {
 const deleteCardsById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      if(card) {
-        res.status(200).send({ data: card })
+      if(!card) {
+        res.status(404).send('Карточка с указанным id не найдена')
       } else {
-        res.send('Ошибка пользователь не найден')
+        res.status(200).send({ data: card })
       }
     })
     .catch((err) => {
-      if(err.name === 'DateError') {
-        return res.status(404).send({ message: 'Карточка не найдена' })
+      if(err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки' })
       }
       return res.status(500).send({ message: 'Произошла ошибка' })
     });
-
 }
 //создаёт карточку
 const createCards = (req, res) => {
@@ -47,11 +46,17 @@ const likeCard = (req, res) => {
     { new: true },
   )
   .then((card) => {
-    (res.status(200).send({ data: card }))
+    if(!card) {
+      return res.status(404).send({ message: 'Передан несуществующий _id карточки' })
+    }
+    return res.status(200).send({ data: card })
   })
-  .catch((err) =>
-    res.status(500).send({ message: 'Произошла ошибка' })
-  )
+  .catch((err) => {
+    if(err.name === 'CastError') {
+      return res.status(400).send({ message: 'Переданы некорректные данные при постановки лайка' })
+    }
+    return res.status(500).send({ message: 'Произошла ошибка' })
+  });
 }
 //убрать лайк с карточки
 const dislikeCard = (req, res) => {
@@ -61,9 +66,17 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
   .then((card) => {
-    (res.status(200).send({ data: card }))
+    if(!card) {
+      return res.status(404).send({ message: 'Передан несуществующий _id карточки' })
+    }
+    return res.status(200).send({ data: card })
   })
-  .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
+  .catch((err) => {
+    if(err.name === 'CastError') {
+      return res.status(400).send({ message: 'Переданы некорректные данные при постановки лайка' })
+    }
+    return res.status(500).send({ message: 'Произошла ошибка' })
+  });
 }
 
 module.exports = {
