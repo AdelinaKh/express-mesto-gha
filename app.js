@@ -18,14 +18,6 @@ app.use((req, res, next) => {
 app.use(user);
 app.use(card);
 
-// mongoose.connect('mongodb://localhost:27017/mestodb', () => {
-//   console.log('Подключение успешно'),
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`Ссылка на сервер ${PORT}`),
-// })
-
 async function main() {
   try {
     await mongoose.connect('mongodb://localhost:27017/mestodb');
