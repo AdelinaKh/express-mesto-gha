@@ -21,7 +21,6 @@ const deleteCardsById = (req, res) => {
       }
       return res.status(500).send({ message: 'Произошла ошибка' })
     });
-
 }
 //создаёт карточку
 const createCards = (req, res) => {
@@ -47,7 +46,10 @@ const likeCard = (req, res) => {
     { new: true },
   )
   .then((card) => {
-    (res.status(200).send({ data: card }))
+    if(!card) {
+      return res.status(404).send({ message: 'Передан несуществующий _id карточки' })
+    }
+    return res.status(200).send({ data: card })
   })
   .catch((err) => {
     if(err.name === 'CastError') {
@@ -64,7 +66,10 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
   .then((card) => {
-    (res.status(200).send({ data: card }))
+    if(!card) {
+      return res.status(404).send({ message: 'Передан несуществующий _id карточки' })
+    }
+    return res.status(200).send({ data: card })
   })
   .catch((err) => {
     if(err.name === 'CastError') {
