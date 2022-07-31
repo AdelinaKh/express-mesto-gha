@@ -9,7 +9,7 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '62dedea7dd5fa23d4325fb30'
+    _id: '62dedea7dd5fa23d4325fb30',
   };
 
   next();
@@ -18,10 +18,22 @@ app.use((req, res, next) => {
 app.use(user);
 app.use(card);
 
-mongoose.connect('mongodb://localhost:27017/mestodb', () => {
-  console.log('Подключение успешно');
-});
+// mongoose.connect('mongodb://localhost:27017/mestodb', () => {
+//   console.log('Подключение успешно'),
+// });
 
-app.listen(PORT, () => {
-  console.log(`Ссылка на сервер ${PORT}`)
-})
+// app.listen(PORT, () => {
+//   console.log(`Ссылка на сервер ${PORT}`),
+// })
+
+async function main() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/mestodb');
+  } catch (error) {
+    console.log(error);
+  }
+  app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}`);
+  });
+}
+main();
