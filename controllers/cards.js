@@ -10,7 +10,7 @@ const deleteCardsById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if(!card) {
-        res.status(404).send('Карточка с указанным id не найдена')
+        res.status(404).send({ message: 'Карточка с указанным id не найдена'})
       } else {
         res.status(200).send({ data: card })
       }
