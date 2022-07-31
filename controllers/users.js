@@ -15,7 +15,12 @@ const getUsersById = (req, res) => {
         res.send('Ошибка пользователь не найден')
       }
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if(err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Переданы некорректные данные' })
+      }
+      return res.status(500).send({ message: 'Произошла ошибка' })
+    });
 }
 //создаёт пользователя
 const createUsers = (req, res) => {
@@ -24,7 +29,12 @@ const createUsers = (req, res) => {
   .then((users) => {
     res.status(200).send({ data: users })
   })
-  .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+  .catch((err) => {
+    if(err.name === 'ValidationError') {
+      return res.status(400).send({ message: 'Переданы некорректные данные при создании пользователя' })
+    }
+    return res.status(500).send({ message: 'Произошла ошибка' })
+  });
 }
 //обновляет профиль
 const updateUserProfile = (req, res) => {
