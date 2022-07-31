@@ -49,9 +49,12 @@ const likeCard = (req, res) => {
   .then((card) => {
     (res.status(200).send({ data: card }))
   })
-  .catch((err) =>
-    res.status(500).send({ message: 'Произошла ошибка' })
-  )
+  .catch((err) => {
+    if(err.name === 'CastError') {
+      return res.status(400).send({ message: 'Переданы некорректные данные при постановки лайка' })
+    }
+    return res.status(500).send({ message: 'Произошла ошибка' })
+  });
 }
 //убрать лайк с карточки
 const dislikeCard = (req, res) => {
@@ -63,7 +66,12 @@ const dislikeCard = (req, res) => {
   .then((card) => {
     (res.status(200).send({ data: card }))
   })
-  .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
+  .catch((err) => {
+    if(err.name === 'CastError') {
+      return res.status(400).send({ message: 'Переданы некорректные данные при постановки лайка' })
+    }
+    return res.status(500).send({ message: 'Произошла ошибка' })
+  });
 }
 
 module.exports = {
