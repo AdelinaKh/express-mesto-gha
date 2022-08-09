@@ -1,21 +1,22 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const user = require('./routes/users');
+const bodyParser = require('body-parser');
+// const user = require('./routes/users');
 const card = require('./routes/cards');
+const { login, createUsers } = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 const app = express();
-app.use(express.json());
+// app.use(express.json());
+app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62dedea7dd5fa23d4325fb30',
-  };
+app.post('/signin', login);
+app.post('/signup', createUsers);
 
-  next();
-});
+app.use(auth);
 
-app.use(user);
+// app.use(user);
 app.use(card);
 
 async function main() {
