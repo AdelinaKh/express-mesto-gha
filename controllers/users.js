@@ -10,12 +10,15 @@ const Conflict = require('../errors/Conflict');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
+  if (!email || !password) {
+    throw new BadRequest('Не указаны почта или пароль');
+  }
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       // вернём токен
-      res.send({ token });
+      res.status(200).send({ token });
     })
     .catch(next);
 };
@@ -23,7 +26,7 @@ const login = (req, res, next) => {
 const getUsers = (req, res, next) => {
   User.find({})
     .then((user) => {
-      res.send({ data: user });
+      res.status(200).send({ data: user });
     })
     .catch(next);
 };
@@ -34,7 +37,7 @@ const getUsersById = (req, res, next) => {
       if (!user) {
         return res.status(NotFound).send({ message: 'Пользователь с указанным _id не найден' });
       }
-      return res.send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -52,6 +55,9 @@ const createUsers = (req, res, next) => {
     email,
     password,
   } = req.body;
+  if (!email || !password) {
+    throw new BadRequest('Не указаны почта или пароль');
+  }
   // хешируем пароль
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -62,7 +68,7 @@ const createUsers = (req, res, next) => {
       password: hash, // записываем хеш в базу
     }))
     .then((users) => {
-      res.send({ data: users });
+      res.status(201).send({ data: users });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -81,7 +87,7 @@ const updateUserProfile = (req, res, next) => {
       if (!user) {
         return res.status(NotFound).send({ message: 'Пользователь с указанным _id не найден' });
       }
-      return res.send({ data: user });
+      return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -98,7 +104,7 @@ const updateUserAvatar = (req, res, next) => {
       if (!user) {
         return res.status(NotFound).send({ message: 'Пользователь с указанным _id не найден' });
       }
-      return res.send({ data: user });
+      return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
