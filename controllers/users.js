@@ -7,6 +7,7 @@ const BadRequest = require('../errors/BadRequest');
 const NotFound = require('../errors/NotFound');
 // const Default = require('../errors/Default');
 const Conflict = require('../errors/Conflict');
+const NotAuthorized = require('../errors/NotAuthorized');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -20,7 +21,9 @@ const login = (req, res, next) => {
       // вернём токен
       res.status(200).send({ token });
     })
-    .catch(next);
+    .catch(() => {
+      next(new NotAuthorized('Неправильные почта или пароль'));
+    });
 };
 // возвращает всех пользователей
 const getUsers = (req, res, next) => {
@@ -35,7 +38,7 @@ const getUsersById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        return res.status(NotFound).send({ message: 'Пользователь с указанным _id не найден' });
+        throw new NotFound('Пользователь с указанным _id не найден');
       }
       return res.status(200).send(user);
     })
@@ -74,7 +77,7 @@ const createUsers = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequest('Переданы некорректные данные при создании пользователя');
       } else if (err.code === 11000) {
-        throw new Conflict({ message: 'Пользователь с таким email уже существует' });
+        throw new Conflict('Пользователь с таким email уже существует');
       }
     })
     .catch(next);
@@ -85,7 +88,7 @@ const updateUserProfile = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        return res.status(NotFound).send({ message: 'Пользователь с указанным _id не найден' });
+        throw new NotFound('Пользователь с указанным _id не найден');
       }
       return res.status(200).send({ data: user });
     })
