@@ -29,6 +29,9 @@ const login = (req, res, next) => {
 const getUsers = (req, res, next) => {
   User.find({})
     .then((user) => {
+      if (user.length === 1) {
+        throw new NotFound('Пользователи не найдены');
+      }
       res.status(200).send({ data: user });
     })
     .catch(next);
@@ -38,9 +41,10 @@ const getUsersById = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        throw new NotFound('Пользователь с указанным _id не найден');
+        next(new NotFound('Пользователь с указанным _id не найден'));
+        return;
       }
-      return res.status(200).send(user);
+      res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -63,22 +67,29 @@ const createUsers = (req, res, next) => {
   }
   // хешируем пароль
   bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash, // записываем хеш в базу
-    }))
-    .then((users) => {
-      res.status(201).send({ data: users });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при создании пользователя');
-      } else if (err.code === 11000) {
-        throw new Conflict('Пользователь с таким email уже существует');
-      }
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash, // записываем хеш в базу
+      })
+        .then((user) => {
+          res.status(201).send({
+            email: user.email,
+            name: user.name,
+            about: user.about,
+            avatar: user.avatar,
+          });
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+          } else if (err.code === 11000) {
+            next(new Conflict('Пользователь с таким email уже существует'));
+          }
+        });
     })
     .catch(next);
 };
