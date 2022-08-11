@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+
 const {
-  ERROR_NOT_AUTHORIZED,
   AVATAR_VALIDATOR,
 } = require('../utils/constants');
 
@@ -41,12 +41,12 @@ userSchema.statics.findUserByCredentials = function (email, password) {
     .select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject(new ERROR_NOT_AUTHORIZED('Не верное имя пользователя или пароль.'));
+        return Promise.reject(new Error('Не верное имя пользователя или пароль.'));
       }
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new ERROR_NOT_AUTHORIZED('Не верное имя пользователя или пароль.'));
+            return Promise.reject(new Error('Не верное имя пользователя или пароль.'));
           }
           return user;
         });
