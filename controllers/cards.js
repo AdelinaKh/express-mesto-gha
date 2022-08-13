@@ -1,10 +1,7 @@
 const Card = require('../models/card');
 
-// const NotAuthorized = require('../errors/NotAuthorized');
 const BadRequest = require('../errors/BadRequest');
 const NotFound = require('../errors/NotFound');
-// const Default = require('../errors/Default');
-// const Conflict = require('../errors/Conflict');
 const Forbidden = require('../errors/Forbidden');
 
 // возвращает все карточки
