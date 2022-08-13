@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const { Joi, celebrate, errors } = require('celebrate');
 const mongoose = require('mongoose');
-// const user = require('./routes/users');
+const user = require('./routes/users');
 const card = require('./routes/cards');
 const { login, createUsers } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -34,7 +34,7 @@ app.post('/signin', celebrate({
 
 app.use(auth);
 
-// app.use(user);
+app.use(user);
 app.use(card);
 
 app.use(errors());

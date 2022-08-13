@@ -10,7 +10,7 @@ const Forbidden = require('../errors/Forbidden');
 // возвращает все карточки
 const getCards = (req, res, next) => {
   Card.find({})
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.status(200).send({ data: card }))
     .catch(next);
 };
 // удаляет карточку по идентификатору
@@ -23,7 +23,7 @@ const deleteCardsById = (req, res, next) => {
         throw new Forbidden('Попытка удалить чужую карточку');
       } else {
         return card.remove()
-          .then(() => res.send(card));
+          .then(() => res.status(200).send(card));
       }
     })
     .catch((err) => {
@@ -40,7 +40,7 @@ const createCards = (req, res, next) => {
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.send(card);
+      res.status(201).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -60,7 +60,7 @@ const likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFound('Передан несуществующий _id карточки');
       }
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -80,7 +80,7 @@ const dislikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFound('Передан несуществующий _id карточки');
       }
-      res.send({ data: card });
+      res.status(200).send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {

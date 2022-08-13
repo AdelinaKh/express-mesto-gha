@@ -2,10 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
-// const NotAuthorized = require('../errors/NotAuthorized');
 const BadRequest = require('../errors/BadRequest');
 const NotFound = require('../errors/NotFound');
-// const Default = require('../errors/Default');
 const Conflict = require('../errors/Conflict');
 const NotAuthorized = require('../errors/NotAuthorized');
 
@@ -33,6 +31,18 @@ const getUsers = (req, res, next) => {
         throw new NotFound('Пользователи не найдены');
       }
       res.status(200).send({ data: user });
+    })
+    .catch(next);
+};
+// возвращает информацию о текущем пользователе
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        next(new NotFound('Пользователь с указанным _id не найден'));
+        return;
+      }
+      res.status(200).send(user);
     })
     .catch(next);
 };
@@ -135,4 +145,5 @@ module.exports = {
   updateUserProfile,
   updateUserAvatar,
   login,
+  getCurrentUser,
 };
