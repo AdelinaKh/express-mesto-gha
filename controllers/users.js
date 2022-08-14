@@ -78,25 +78,25 @@ const createUsers = (req, res, next) => {
         name,
         about,
         avatar,
-        email,
+        email: req.body.email,
         password: hash, // записываем хеш в базу
       })
         .then((user) => {
           res.status(201).send({
             email: user.email,
             name: user.name,
+            _id: user._id,
             about: user.about,
             avatar: user.avatar,
           });
         })
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            next(new BadRequest('Переданы некорректные данные при создании пользователя'));
-          } else if (err.code === 11000) {
-            next(new Conflict('Пользователь с таким email уже существует'));
-          } else {
-            next(err);
+            return next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+          } if (err.code === 11000) {
+            return next(new Conflict('Пользователь с таким email уже существует'));
           }
+          return next(err);
         });
     });
 };
