@@ -7,12 +7,12 @@ const Forbidden = require('../errors/Forbidden');
 // возвращает все карточки
 const getCards = (req, res, next) => {
   Card.find({})
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.send({ data: card }))
     .catch(next);
 };
 // удаляет карточку по идентификатору
 const deleteCardsById = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFound('Карточка с указанным id не найдена');
@@ -20,15 +20,16 @@ const deleteCardsById = (req, res, next) => {
         throw new Forbidden('Попытка удалить чужую карточку');
       } else {
         return card.remove()
-          .then(() => res.status(200).send(card));
+          .then(() => res.send(card));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные');
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 // создаёт карточку
 const createCards = (req, res, next) => {
@@ -41,10 +42,11 @@ const createCards = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при создании карточки');
+        next(new BadRequest('Переданы некорректные данные при создании карточки'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 // поставить лайк карточке
 const likeCard = (req, res, next) => {
@@ -57,14 +59,15 @@ const likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFound('Передан несуществующий _id карточки');
       }
-      res.status(200).send({ data: card });
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные при постановки лайка');
+        next(new BadRequest('Переданы некорректные данные при постановки лайка'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 // убрать лайк с карточки
 const dislikeCard = (req, res, next) => {
@@ -77,14 +80,15 @@ const dislikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFound('Передан несуществующий _id карточки');
       }
-      res.status(200).send({ data: card });
+      res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные при постановки лайка');
+        next(new BadRequest('Переданы некорректные данные при постановки лайка'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {

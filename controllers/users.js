@@ -9,15 +9,13 @@ const NotAuthorized = require('../errors/NotAuthorized');
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    throw new BadRequest('Не указаны почта или пароль');
-  }
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // создадим токен
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       // вернём токен
-      res.status(200).send({ token });
+      res.send({ token });
     })
     .catch(() => {
       next(new NotAuthorized('Неправильные почта или пароль'));
@@ -27,10 +25,7 @@ const login = (req, res, next) => {
 const getUsers = (req, res, next) => {
   User.find({})
     .then((user) => {
-      if (user.length === 1) {
-        throw new NotFound('Пользователи не найдены');
-      }
-      res.status(200).send({ data: user });
+      res.send({ data: user });
     })
     .catch(next);
 };
@@ -42,7 +37,7 @@ const getCurrentUser = (req, res, next) => {
         next(new NotFound('Пользователь с указанным _id не найден'));
         return;
       }
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch(next);
 };
@@ -54,14 +49,15 @@ const getUsersById = (req, res, next) => {
         next(new NotFound('Пользователь с указанным _id не найден'));
         return;
       }
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Переданы некорректные данные');
+        next(new BadRequest('Переданы некорректные данные'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 // создаёт пользователя
 const createUsers = (req, res, next) => {
@@ -98,10 +94,11 @@ const createUsers = (req, res, next) => {
             next(new BadRequest('Переданы некорректные данные при создании пользователя'));
           } else if (err.code === 11000) {
             next(new Conflict('Пользователь с таким email уже существует'));
+          } else {
+            next(err);
           }
         });
-    })
-    .catch(next);
+    });
 };
 // обновляет профиль
 const updateUserProfile = (req, res, next) => {
@@ -111,14 +108,15 @@ const updateUserProfile = (req, res, next) => {
       if (!user) {
         throw new NotFound('Пользователь с указанным _id не найден');
       }
-      return res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при редактировании профиля');
+        next(new BadRequest('Переданы некорректные данные при редактировании профиля'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 // обновляет аватар
 const updateUserAvatar = (req, res, next) => {
@@ -128,14 +126,15 @@ const updateUserAvatar = (req, res, next) => {
       if (!user) {
         return res.status(NotFound).send({ message: 'Пользователь с указанным _id не найден' });
       }
-      return res.status(200).send({ data: user });
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequest('Переданы некорректные данные при редактировании аватара');
+        next(new BadRequest('Переданы некорректные данные при редактировании аватара'));
+      } else {
+        next(err);
       }
-    })
-    .catch(next);
+    });
 };
 
 module.exports = {
