@@ -2,7 +2,7 @@ const ERROR_CODE_BAD_REQUEST = 400;
 const ERROR_CODE_NOT_FOUND = 404;
 const ERROR_CODE_DEFAULT = 500;
 const ERROR_NOT_AUTHORIZED = 401;
-const AVATAR_VALIDATOR = /(http:\/\/|https:\/\/)(www)*[a-z0-9\S]*/;
+const AVATAR_VALIDATOR = /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/;
 
 module.exports = {
   ERROR_CODE_BAD_REQUEST,
