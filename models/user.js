@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const isEmail = require('validator/lib/isEmail');
 
 const {
   AVATAR_VALIDATOR,
@@ -29,6 +30,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'About is required'],
     unique: true,
+    validate: {
+      validator: (email) => isEmail(email),
+    },
   },
   password: {
     type: String,

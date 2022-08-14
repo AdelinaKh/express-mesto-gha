@@ -5,11 +5,8 @@ module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(NotAuthorized)
-      .send({ message: 'Необходи авторизация' });
+    return next(new NotAuthorized('Необходи авторизация'));
   }
-
   const token = authorization.replace('Bearer ', '');
   let payload;
 
@@ -17,10 +14,7 @@ module.exports = (req, res, next) => {
     payload = jwt.verify(token, 'some-secret-key');
     req.user = payload;
   } catch (err) {
-    return res
-      .status(NotAuthorized)
-      .send({ message: 'Необходима авторизация' });
+    return next(new NotAuthorized('Необходи авторизация'));
   }
-
   return next();
 };
