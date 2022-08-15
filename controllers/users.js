@@ -97,7 +97,8 @@ const createUsers = (req, res, next) => {
             return next(new Conflict('Пользователь с таким email уже существует'));
           }
           return next(err);
-        });
+        })
+        .catch(next);
     });
 };
 // обновляет профиль
