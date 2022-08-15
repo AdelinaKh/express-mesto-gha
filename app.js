@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
+const handleError = require('./middlewares/handle-error');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use(routes);
 
 app.use(errors());
+app.use(handleError);
 
 async function main() {
   try {
